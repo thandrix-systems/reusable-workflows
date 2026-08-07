@@ -54,7 +54,7 @@ jobs:
   unit-tests:
     if: ${{ inputs.run_unit-tests }}
     name: Running Unit Tests
-    runs-on: self-hosted
+    runs-on: [self-hosted, linux, x64]
 
     steps:
       - name: Checkout Code
@@ -64,7 +64,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: '25'
           cache: maven
 
       - name: Run Tests + Coverage
@@ -91,7 +91,7 @@ jobs:
   codeql:
     if: ${{ inputs.run_codeql }}
     name: CodeQL Security Scan
-    runs-on: self-hosted
+    runs-on: [self-hosted, linux, x64]
 
     permissions:
       actions: read
@@ -110,7 +110,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: '25'
           cache: maven
 
       - name: Initialize CodeQL
@@ -129,7 +129,7 @@ jobs:
   sonarqube:
     if: ${{ inputs.run_sonarqube }}
     name: Sonarqube Analysis
-    runs-on: self-hosted
+    runs-on: [self-hosted, linux, x64]
     needs: unit-tests
     steps:
       - uses: actions/checkout@v4 # v4.3.1
@@ -142,10 +142,10 @@ jobs:
           name: jacoco-coverage-report
           path: coverage-report
 
-      - name: Set up JDK 21
+      - name: Set up JDK 25
         uses: actions/setup-java@v5 # v4.8.0
         with:
-          java-version: 21
+          java-version: 25
           distribution: 'temurin' # Alternative distribution options are available.
       
       - name: Cache SonarQube packages
@@ -175,7 +175,7 @@ jobs:
   Docker:
     if: ${{ inputs.run_docker }}
     name: Docker Build and Push
-    runs-on: self-hosted
+    runs-on: [self-hosted, linux, x64]
     needs: sonarqube
     outputs:
       image-tag: ${{ steps.vars.outputs.IMAGE_TAG }}
@@ -187,7 +187,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: '25'
           cache: maven
 
       - name: Build JAR with Maven
@@ -223,7 +223,7 @@ jobs:
   publish-to-dockerhub:
     if: ${{ inputs.run_publish_to_dockerhub }}
     name: Publish to DockerHub
-    runs-on: self-hosted
+    runs-on: [self-hosted, linux, x64]
     needs: Docker
     steps:
       - name: Download Docker Image Artifact
@@ -254,7 +254,7 @@ jobs:
   publish-to-github-container-registry:
     if: ${{ inputs.run_publish_to_github_container_registry }}
     name: Publish to GitHub Container Registry
-    runs-on: self-hosted
+    runs-on: [self-hosted, linux, x64]
     needs: Docker
     permissions:
       contents: read
