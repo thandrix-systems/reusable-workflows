@@ -67,6 +67,11 @@ jobs:
           java-version: '25'
           cache: maven
 
+      - name: Setup Maven
+        uses: stCarolas/setup-maven@v5
+        with:
+          maven-version: 3.9.11
+
       - name: Run Tests + Coverage
         run: mvn clean verify
 
@@ -113,6 +118,11 @@ jobs:
           java-version: '25'
           cache: maven
 
+      - name: Setup Maven
+        uses: stCarolas/setup-maven@v5
+        with:
+          maven-version: 3.9.11
+
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
@@ -147,6 +157,11 @@ jobs:
         with:
           java-version: 25
           distribution: 'temurin' # Alternative distribution options are available.
+
+      - name: Setup Maven
+        uses: stCarolas/setup-maven@v5
+        with:
+          maven-version: 3.9.11
       
       - name: Cache SonarQube packages
         uses: actions/cache@v4 # v4.3.0
@@ -189,6 +204,11 @@ jobs:
           distribution: temurin
           java-version: '25'
           cache: maven
+
+      - name: Setup Maven
+        uses: stCarolas/setup-maven@v5
+        with:
+          maven-version: 3.9.11
 
       - name: Build JAR with Maven
         run: mvn -B clean package -DskipTests
