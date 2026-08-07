@@ -4,6 +4,12 @@ name: ci-pipelines
 on:
   workflow_call:
     inputs:
+      java-version:
+        description: 'Java version used by Maven-based jobs'
+        default: '21'
+        required: false
+        type: string
+
       run_unit-tests:
         description: 'Run Unit Tests'
         default: true
@@ -64,7 +70,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: '25'
+          java-version: ${{ inputs.java-version }}
           cache: maven
 
       - name: Setup Maven
@@ -115,7 +121,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: '25'
+          java-version: ${{ inputs.java-version }}
           cache: maven
 
       - name: Setup Maven
@@ -152,10 +158,10 @@ jobs:
           name: jacoco-coverage-report
           path: coverage-report
 
-      - name: Set up JDK 25
+      - name: Set up Java
         uses: actions/setup-java@v5 # v4.8.0
         with:
-          java-version: 25
+          java-version: ${{ inputs.java-version }}
           distribution: 'temurin' # Alternative distribution options are available.
 
       - name: Setup Maven
@@ -202,7 +208,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: '25'
+          java-version: ${{ inputs.java-version }}
           cache: maven
 
       - name: Setup Maven
