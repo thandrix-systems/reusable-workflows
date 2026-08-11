@@ -6,7 +6,7 @@ on:
     inputs:
       java-version:
         description: 'Java version used by Maven-based jobs'
-        default: '21'
+        default: '25'
         required: false
         type: string
 
