@@ -60,7 +60,7 @@ jobs:
   unit-tests:
     if: ${{ inputs.run_unit-tests }}
     name: Running Unit Tests
-    runs-on: [self-hosted, linux, x64]
+    runs-on: arc-runner-set
 
     steps:
       - name: Checkout Code
@@ -102,7 +102,7 @@ jobs:
   codeql:
     if: ${{ inputs.run_codeql }}
     name: CodeQL Security Scan
-    runs-on: [self-hosted, linux, x64]
+    runs-on: arc-runner-set
 
     permissions:
       actions: read
@@ -145,7 +145,7 @@ jobs:
   sonarqube:
     if: ${{ inputs.run_sonarqube }}
     name: Sonarqube Analysis
-    runs-on: [self-hosted, linux, x64]
+    runs-on: arc-runner-set
     needs: unit-tests
     steps:
       - uses: actions/checkout@v4 # v4.3.1
@@ -196,7 +196,7 @@ jobs:
   Docker:
     if: ${{ inputs.run_docker }}
     name: Docker Build and Push
-    runs-on: [self-hosted, linux, x64]
+    runs-on: arc-runner-set
     needs: sonarqube
     outputs:
       image-tag: ${{ steps.vars.outputs.IMAGE_TAG }}
@@ -249,7 +249,7 @@ jobs:
   publish-to-dockerhub:
     if: ${{ inputs.run_publish_to_dockerhub }}
     name: Publish to DockerHub
-    runs-on: [self-hosted, linux, x64]
+    runs-on: arc-runner-set
     needs: Docker
     steps:
       - name: Download Docker Image Artifact
@@ -280,7 +280,7 @@ jobs:
   publish-to-github-container-registry:
     if: ${{ inputs.run_publish_to_github_container_registry }}
     name: Publish to GitHub Container Registry
-    runs-on: [self-hosted, linux, x64]
+    runs-on: arc-runner-set
     needs: Docker
     permissions:
       contents: read
