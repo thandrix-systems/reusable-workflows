@@ -73,10 +73,13 @@ jobs:
           java-version: '21'
           cache: maven
 
-      - name: Setup Maven
-        uses: stCarolas/setup-maven@v5
-        with:
-          maven-version: 3.9.11
+      - name: Install Maven
+        run: |
+          if ! command -v mvn >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y maven
+          fi
+          mvn -version
 
       - name: Run Tests + Coverage
         run: mvn clean verify
@@ -124,10 +127,13 @@ jobs:
           java-version: ${{ inputs.java-version }}
           cache: maven
 
-      - name: Setup Maven
-        uses: stCarolas/setup-maven@v5
-        with:
-          maven-version: 3.9.11
+      - name: Install Maven
+        run: |
+          if ! command -v mvn >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y maven
+          fi
+          mvn -version
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
@@ -164,10 +170,13 @@ jobs:
           java-version: ${{ inputs.java-version }}
           distribution: 'temurin' # Alternative distribution options are available.
 
-      - name: Setup Maven
-        uses: stCarolas/setup-maven@v5
-        with:
-          maven-version: 3.9.11
+      - name: Install Maven
+        run: |
+          if ! command -v mvn >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y maven
+          fi
+          mvn -version
       
       - name: Cache SonarQube packages
         uses: actions/cache@v4 # v4.3.0
@@ -211,10 +220,13 @@ jobs:
           java-version: ${{ inputs.java-version }}
           cache: maven
 
-      - name: Setup Maven
-        uses: stCarolas/setup-maven@v5
-        with:
-          maven-version: 3.9.11
+      - name: Install Maven
+        run: |
+          if ! command -v mvn >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y maven
+          fi
+          mvn -version
 
       - name: Build JAR with Maven
         run: mvn -B clean package -DskipTests
