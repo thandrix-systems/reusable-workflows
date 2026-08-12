@@ -70,7 +70,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: ${{ inputs.java-version }}
           cache: maven
 
       - name: Install Maven
@@ -82,7 +82,7 @@ jobs:
           mvn -version
 
       - name: Run Tests + Coverage
-        run: mvn clean verify
+        run: mvn -Dmaven.compiler.source=${{ inputs.java-version }} -Dmaven.compiler.target=${{ inputs.java-version }} -Dmaven.compiler.release=${{ inputs.java-version }} clean verify
 
       - name: Verify report exists
         run: ls -R target/site || echo "No report generated"
@@ -141,7 +141,7 @@ jobs:
           languages: ${{ matrix.language }}
 
       - name: Build with Maven
-        run: mvn clean compile -DskipTests
+        run: mvn -Dmaven.compiler.source=${{ inputs.java-version }} -Dmaven.compiler.target=${{ inputs.java-version }} -Dmaven.compiler.release=${{ inputs.java-version }} clean compile -DskipTests
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
@@ -195,7 +195,7 @@ jobs:
       - name: Build and analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -B compile sonar:sonar -Dsonar.projectKey=Thando77_Learning-Github-Actions -Dsonar.organization=thando77 -Dsonar.host.url=https://sonarcloud.io -Dsonar.coverage.jacoco.xmlReportPaths=coverage-report/jacoco.xml -Dsonar.working.directory=.scannerwork
+        run: mvn -Dmaven.compiler.source=${{ inputs.java-version }} -Dmaven.compiler.target=${{ inputs.java-version }} -Dmaven.compiler.release=${{ inputs.java-version }} -B compile sonar:sonar -Dsonar.projectKey=Thando77_Learning-Github-Actions -Dsonar.organization=thando77 -Dsonar.host.url=https://sonarcloud.io -Dsonar.coverage.jacoco.xmlReportPaths=coverage-report/jacoco.xml -Dsonar.working.directory=.scannerwork
       
       - name: SonarQube Quality Gate Check
         uses: sonarsource/sonarqube-quality-gate-action@master
@@ -229,7 +229,7 @@ jobs:
           mvn -version
 
       - name: Build JAR with Maven
-        run: mvn -B clean package -DskipTests
+        run: mvn -Dmaven.compiler.source=${{ inputs.java-version }} -Dmaven.compiler.target=${{ inputs.java-version }} -Dmaven.compiler.release=${{ inputs.java-version }} -B clean package -DskipTests
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
