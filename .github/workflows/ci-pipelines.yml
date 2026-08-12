@@ -6,7 +6,7 @@ on:
     inputs:
       java-version:
         description: 'Java version used by Maven-based jobs'
-        default: '25'
+        default: '21'
         required: false
         type: string
 
@@ -70,7 +70,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: ${{ inputs.java-version }}
+          java-version: '21'
           cache: maven
 
       - name: Setup Maven
