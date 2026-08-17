@@ -10,6 +10,12 @@ on:
         required: false
         type: string
 
+      docker-runs-on:
+        description: 'Runner label for Docker build and publish jobs'
+        default: 'ubuntu-latest'
+        required: false
+        type: string
+
       run_unit-tests:
         description: 'Run Unit Tests'
         default: true
@@ -212,7 +218,7 @@ jobs:
   Docker:
     if: ${{ inputs.run_docker }}
     name: Docker Build and Push
-    runs-on: arc-runner-set
+    runs-on: ${{ inputs.docker-runs-on }}
     needs: sonarqube
     outputs:
       image-tag: ${{ steps.vars.outputs.IMAGE_TAG }}
@@ -268,7 +274,7 @@ jobs:
   publish-to-dockerhub:
     if: ${{ inputs.run_publish_to_dockerhub }}
     name: Publish to DockerHub
-    runs-on: arc-runner-set
+    runs-on: ${{ inputs.docker-runs-on }}
     needs: Docker
     steps:
       - name: Download Docker Image Artifact
@@ -299,7 +305,7 @@ jobs:
   publish-to-github-container-registry:
     if: ${{ inputs.run_publish_to_github_container_registry }}
     name: Publish to GitHub Container Registry
-    runs-on: arc-runner-set
+    runs-on: ${{ inputs.docker-runs-on }}
     needs: Docker
     permissions:
       contents: read
