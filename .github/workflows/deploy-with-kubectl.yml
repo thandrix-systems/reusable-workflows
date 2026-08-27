@@ -3,14 +3,18 @@ name: deploy-with-kubectl
 on:
   workflow_call:
     inputs:
-        NAMESPACE:
-          description: 'Kubernetes Namespace'
-          required: true
-          type: string
-        IMAGE_NAME:
-          description: 'Docker Image Name'
-          required: true
-          type: string
+      ENVIRONMENT:
+        description: 'Deployment Environment (e.g Integration, Master)'
+        required: true 
+        type: string
+      NAMESPACE:
+        description: 'Kubernetes Namespace'
+        required: true
+        type: string
+      IMAGE_NAME:
+        description: 'Docker Image Name'
+        required: true
+        type: string
 
     secrets:
       KUBECONFIG:
@@ -26,9 +30,6 @@ on:
       - dev
       - feature/*
       - deploy-using-kubectl
-      
-  # pull_request:
-  #   types: [opened, synchronize, reopened]
 
 permissions:
   actions: read
