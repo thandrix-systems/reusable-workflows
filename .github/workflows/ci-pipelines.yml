@@ -271,45 +271,11 @@ jobs:
           name: thandrix_app_image
           path: thandrix_app.tar
 
-  # publish-to-dockerhub:
-  #   if: ${{ inputs.run_publish_to_dockerhub }}
-  #   name: Publish to DockerHub
-  #   runs-on: ${{ inputs.docker-runs-on }}
-  #   needs: Docker
-  #   steps:
-  #     - name: Download Docker Image Artifact
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: thandrix_app_image
-  #         path: .
-
-  #     - name: Load Docker Image
-  #       run: docker load -i thandrix_app.tar
-
-  #     - name: Log in to DockerHub
-  #       uses: docker/login-action@v3 #docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_TOKEN }}
-  #       with:
-  #         username: ${{ secrets.DOCKERHUB_USERNAME }}
-  #         password: ${{ secrets.DOCKERHUB_PASSWORD }}
-
-  #     - name: Tag Image
-  #       run: |
-  #         IMAGE_TAG="${{ needs.Docker.outputs.image-tag }}"
-  #         docker image tag thandrix_app:${IMAGE_TAG} ${{ secrets.DOCKERHUB_USERNAME }}/thandrix_app:${IMAGE_TAG}
-
-  #     - name: Push Image to DockerHub
-  #       run: |
-  #         IMAGE_TAG="${{ needs.Docker.outputs.image-tag }}"
-  #         docker image push ${{ secrets.DOCKERHUB_USERNAME }}/thandrix_app:${IMAGE_TAG}
-
-  publish-to-github-container-registry:
-    if: ${{ inputs.run_publish_to_github_container_registry }}
-    name: Publish to GitHub Container Registry
+  publish-to-dockerhub:
+    if: ${{ inputs.run_publish_to_dockerhub }}
+    name: Publish to DockerHub
     runs-on: ${{ inputs.docker-runs-on }}
     needs: Docker
-    permissions:
-      contents: read
-      packages: write
     steps:
       - name: Download Docker Image Artifact
         uses: actions/download-artifact@v4
@@ -320,21 +286,55 @@ jobs:
       - name: Load Docker Image
         run: docker load -i thandrix_app.tar
 
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
+      - name: Log in to DockerHub
+        uses: docker/login-action@v3 #docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_TOKEN }}
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Tag Image
         run: |
           IMAGE_TAG="${{ needs.Docker.outputs.image-tag }}"
-          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
-          docker image tag thandrix_app:${IMAGE_TAG} ghcr.io/${OWNER}/thandrix_app:${IMAGE_TAG}
+          docker image tag thandrix_app:${IMAGE_TAG} ${{ secrets.DOCKERHUB_USERNAME }}/thandrix_app:${IMAGE_TAG}
 
-      - name: Push Image to GitHub Container Registry
+      - name: Push Image to DockerHub
         run: |
           IMAGE_TAG="${{ needs.Docker.outputs.image-tag }}"
-          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
-          docker image push ghcr.io/${OWNER}/thandrix_app:${IMAGE_TAG}             
+          docker image push ${{ secrets.DOCKERHUB_USERNAME }}/thandrix_app:${IMAGE_TAG}
+
+  # publish-to-github-container-registry:
+  #   if: ${{ inputs.run_publish_to_github_container_registry }}
+  #   name: Publish to GitHub Container Registry
+  #   runs-on: ${{ inputs.docker-runs-on }}
+  #   needs: Docker
+  #   permissions:
+  #     contents: read
+  #     packages: write
+  #   steps:
+  #     - name: Download Docker Image Artifact
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: thandrix_app_image
+  #         path: .
+
+  #     - name: Load Docker Image
+  #       run: docker load -i thandrix_app.tar
+
+  #     - name: Log in to GitHub Container Registry
+  #       uses: docker/login-action@v3
+  #       with:
+  #         registry: ghcr.io
+  #         username: ${{ github.actor }}
+  #         password: ${{ secrets.GITHUB_TOKEN }}
+
+  #     - name: Tag Image
+  #       run: |
+  #         IMAGE_TAG="${{ needs.Docker.outputs.image-tag }}"
+  #         OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+  #         docker image tag thandrix_app:${IMAGE_TAG} ghcr.io/${OWNER}/thandrix_app:${IMAGE_TAG}
+
+  #     - name: Push Image to GitHub Container Registry
+  #       run: |
+  #         IMAGE_TAG="${{ needs.Docker.outputs.image-tag }}"
+  #         OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+  #         docker image push ghcr.io/${OWNER}/thandrix_app:${IMAGE_TAG}             
