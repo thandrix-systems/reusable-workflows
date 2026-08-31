@@ -39,7 +39,8 @@ jobs:
     environment: ${{ inputs.ENVIRONMENT }}
     env:
       NAMESPACE: ${{ inputs.NAMESPACE}}  
-    runs-on: arc-runner-set
+    #runs-on: arc-runner-set
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
