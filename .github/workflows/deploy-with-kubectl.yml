@@ -20,6 +20,12 @@ on:
       KUBECONFIG:
         description: 'Kubeconfig for the target cluster'
         required: true
+      DOCKERHUB_USERNAME:
+        description: 'Docker Hub username with pull access'
+        required: true
+      DOCKERHUB_PASSWORD:
+        description: 'Docker Hub password or token with pull access'
+        required: true
 
 permissions:
   actions: read
@@ -32,8 +38,7 @@ jobs:
     environment: ${{ inputs.ENVIRONMENT }}
     env:
       NAMESPACE: ${{ inputs.NAMESPACE}}  
-    #runs-on: arc-runner-set
-    runs-on: ubuntu-latest
+    runs-on: arc-runner-set
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -50,8 +55,25 @@ jobs:
           mkdir -p ~/.kube
           printf '%s' "${{ secrets.KUBECONFIG }}" > ~/.kube/config
           chmod 600 ~/.kube/config
+          SERVER="$(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}')"
+          if [ -z "$SERVER" ]; then
+            echo "::error::KUBECONFIG is invalid: cluster server URL is missing"
+            exit 1
+          fi
+          if echo "$SERVER" | grep -q "kubernetes.docker.internal"; then
+            echo "::error::KUBECONFIG points to Docker Desktop (kubernetes.docker.internal), which is not reachable from GitHub-hosted runners"
+            echo "::error::Update KUBECONFIG secret to a reachable cluster endpoint"
+            exit 1
+          fi
           kubectl config current-context
           kubectl config view --minify
+
+      - name: Validate required deploy inputs
+        run: |
+          if [ -z "${NAMESPACE}" ]; then
+            echo "::error::NAMESPACE input is empty. Set vars.NAMESPACE in the caller repo/environment."
+            exit 1
+          fi
 
       - name: Install yq
         run: |
@@ -68,16 +90,16 @@ jobs:
           cat manifests/deployment.yaml
       - name: Create Namespace if not exists
         run: |
-          kubectl get namespace $NAMESPACE || kubectl create namespace $NAMESPACE
+          kubectl get namespace "$NAMESPACE" || kubectl create namespace "$NAMESPACE"
 
-      # - name: Create GHCR image pull secret
-      #   run: |
-      #     kubectl create secret docker-registry ghcr-pull-secret \
-      #       --namespace "$NAMESPACE" \
-      #       --docker-server=ghcr.io \
-      #       --docker-username="${{ github.actor }}" \
-      #       --docker-password="${{ secrets.GITHUB_TOKEN }}" \
-      #       --dry-run=client -o yaml | kubectl apply -f -
+      - name: Create Docker Hub image pull secret
+        run: |
+          kubectl create secret docker-registry dockerhub-pull-secret \
+            --namespace "$NAMESPACE" \
+            --docker-server=index.docker.io \
+            --docker-username="${{ secrets.DOCKERHUB_USERNAME }}" \
+            --docker-password="${{ secrets.DOCKERHUB_PASSWORD }}" \
+            --dry-run=client -o yaml | kubectl apply -f -
          
       - name: Deploy to Kubernetes Cluster
         run: |
