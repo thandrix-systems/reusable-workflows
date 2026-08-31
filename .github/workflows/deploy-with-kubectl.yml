@@ -55,9 +55,10 @@ jobs:
       - name: Configure Kubeconfig
         run: |
           mkdir -p ~/.kube
-          echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
-          kubectl version
-          kubectl get nodes
+          printf '%s' "${{ secrets.KUBECONFIG }}" > ~/.kube/config
+          chmod 600 ~/.kube/config
+          kubectl config current-context
+          kubectl config view --minify
 
       - name: Install yq
         run: |
